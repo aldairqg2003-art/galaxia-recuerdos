@@ -2,19 +2,22 @@
 // 🌌 NUESTRA GALAXIA
 // ==========================================
 
+
 // ==========================================
 // SUPABASE
 // ==========================================
 
-const SUPABASE_URL = "https://agioxyqgonhntmgyxgxr.supabase.co";
+const SUPABASE_URL =
+    "https://agioxyqgonhntmgyxgxr.supabase.co";
 
 const SUPABASE_KEY =
     "sb_publishable_i6gwm4z2Ig0IX29oWWhWXw_npzXPJg9";
 
-const supabaseClient = window.supabase.createClient(
-    SUPABASE_URL,
-    SUPABASE_KEY
-);
+const supabaseClient =
+    window.supabase.createClient(
+        SUPABASE_URL,
+        SUPABASE_KEY
+    );
 
 
 // ==========================================
@@ -30,12 +33,23 @@ const TABLA = "recuerdos";
 // ELEMENTOS
 // ==========================================
 
-const entrarBtn = document.getElementById("entrarBtn");
-const subirBtn = document.getElementById("subirBtn");
-const fotoInput = document.getElementById("fotoInput");
-const galeria = document.getElementById("galeria");
-const galeriaFotos = document.getElementById("galeriaFotos");
-const contador = document.getElementById("contador");
+const entrarBtn =
+    document.getElementById("entrarBtn");
+
+const subirBtn =
+    document.getElementById("subirBtn");
+
+const fotoInput =
+    document.getElementById("fotoInput");
+
+const galeria =
+    document.getElementById("galeria");
+
+const galeriaFotos =
+    document.getElementById("galeriaFotos");
+
+const contador =
+    document.getElementById("contador");
 
 
 // ==========================================
@@ -44,32 +58,38 @@ const contador = document.getElementById("contador");
 
 if (entrarBtn) {
 
-    entrarBtn.addEventListener("click", function () {
+    entrarBtn.addEventListener(
+        "click",
+        function () {
 
-        if (galeria) {
+            if (galeria) {
 
-            galeria.scrollIntoView({
-                behavior: "smooth"
-            });
+                galeria.scrollIntoView({
+                    behavior: "smooth"
+                });
+
+            }
 
         }
-
-    });
+    );
 
 }
 
 
 // ==========================================
-// SUBIR FOTO
+// BOTÓN SUBIR FOTO
 // ==========================================
 
 if (subirBtn && fotoInput) {
 
-    subirBtn.addEventListener("click", function () {
+    subirBtn.addEventListener(
+        "click",
+        function () {
 
-        fotoInput.click();
+            fotoInput.click();
 
-    });
+        }
+    );
 
 }
 
@@ -80,20 +100,28 @@ if (subirBtn && fotoInput) {
 
 if (fotoInput) {
 
-    fotoInput.addEventListener("change", async function (event) {
+    fotoInput.addEventListener(
+        "change",
+        async function (event) {
 
-        const archivos =
-            Array.from(event.target.files);
+            const archivos =
+                Array.from(
+                    event.target.files
+                );
 
-        if (archivos.length === 0) {
-            return;
+            if (archivos.length === 0) {
+                return;
+            }
+
+            await procesarFotos(
+                archivos
+            );
+
+            // Limpiar el input
+            fotoInput.value = "";
+
         }
-
-        await procesarFotos(archivos);
-
-        fotoInput.value = "";
-
-    });
+    );
 
 }
 
@@ -110,6 +138,10 @@ async function procesarFotos(archivos) {
             "🌸 Preparando fotos..."
         );
 
+
+        // ==========================================
+        // CONSULTAR CUÁNTAS FOTOS EXISTEN
+        // ==========================================
 
         const { data, error } =
             await supabaseClient
@@ -136,7 +168,14 @@ async function procesarFotos(archivos) {
             data.length;
 
 
-        if (cantidadActual >= MAX_FOTOS) {
+        // ==========================================
+        // COMPROBAR LÍMITE
+        // ==========================================
+
+        if (
+            cantidadActual >=
+            MAX_FOTOS
+        ) {
 
             mostrarMensaje(
                 "✨ Ya alcanzaron el máximo de 50 fotos."
@@ -147,7 +186,8 @@ async function procesarFotos(archivos) {
 
 
         const espacioDisponible =
-            MAX_FOTOS - cantidadActual;
+            MAX_FOTOS -
+            cantidadActual;
 
 
         const fotosParaSubir =
@@ -160,10 +200,61 @@ async function procesarFotos(archivos) {
         let cantidadSubida = 0;
 
 
-        for (const archivo of fotosParaSubir) {
+        // ==========================================
+        // SUBIR UNA POR UNA
+        // ==========================================
+
+        for (
+            const archivo
+            of fotosParaSubir
+        ) {
+
+
+            // ==========================================
+            // PEDIR MENSAJE
+            // ==========================================
+
+            const mensaje =
+                prompt(
+                    "🌸 Escribe un mensaje para este recuerdo:"
+                );
+
+
+            // ==========================================
+            // SI CANCELA
+            // ==========================================
+
+            if (
+                mensaje === null
+            ) {
+
+                mostrarMensaje(
+                    "✨ Subida cancelada."
+                );
+
+                continue;
+            }
+
+
+            // ==========================================
+            // SI DEJA VACÍO
+            // ==========================================
+
+            const mensajeFinal =
+                mensaje.trim() !== ""
+                    ? mensaje.trim()
+                    : "Un recuerdo de nuestra galaxia ✨";
+
+
+            // ==========================================
+            // SUBIR FOTO
+            // ==========================================
 
             const resultado =
-                await subirFoto(archivo);
+                await subirFoto(
+                    archivo,
+                    mensajeFinal
+                );
 
 
             if (resultado) {
@@ -175,16 +266,23 @@ async function procesarFotos(archivos) {
         }
 
 
+        // ==========================================
+        // ACTUALIZAR GALERÍA
+        // ==========================================
+
         await cargarFotos();
 
 
-        if (cantidadSubida > 0) {
+        if (
+            cantidadSubida > 0
+        ) {
 
             mostrarMensaje(
                 `✨ ${cantidadSubida} foto(s) agregada(s).`
             );
 
         }
+
 
     } catch (error) {
 
@@ -206,11 +304,23 @@ async function procesarFotos(archivos) {
 // SUBIR UNA FOTO
 // ==========================================
 
-async function subirFoto(archivo) {
+async function subirFoto(
+    archivo,
+    mensaje
+) {
 
     try {
 
-        if (!archivo.type.startsWith("image/")) {
+
+        // ==========================================
+        // COMPROBAR QUE SEA IMAGEN
+        // ==========================================
+
+        if (
+            !archivo.type.startsWith(
+                "image/"
+            )
+        ) {
 
             mostrarMensaje(
                 `❌ ${archivo.name} no es una imagen.`
@@ -220,6 +330,10 @@ async function subirFoto(archivo) {
         }
 
 
+        // ==========================================
+        // EXTENSIÓN
+        // ==========================================
+
         const extension =
             archivo.name
                 .split(".")
@@ -227,14 +341,25 @@ async function subirFoto(archivo) {
                 .toLowerCase();
 
 
+        // ==========================================
+        // NOMBRE BASE
+        // ==========================================
+
         const nombreBase =
             archivo.name
-                .replace(/\.[^/.]+$/, "")
+                .replace(
+                    /\.[^/.]+$/,
+                    ""
+                )
                 .replace(
                     /[^a-zA-Z0-9-_]/g,
                     "_"
                 );
 
+
+        // ==========================================
+        // NOMBRE ÚNICO
+        // ==========================================
 
         const nombreUnico =
             Date.now() +
@@ -248,23 +373,27 @@ async function subirFoto(archivo) {
             extension;
 
 
+        // ==========================================
+        // RUTA
+        // ==========================================
+
         const ruta =
             "recuerdos/" +
             nombreUnico;
 
 
         mostrarMensaje(
-            "📤 Subiendo " +
-            archivo.name +
-            "..."
+            "📤 Subiendo recuerdo..."
         );
 
 
-        // ======================================
+        // ==========================================
         // STORAGE
-        // ======================================
+        // ==========================================
 
-        const { error: uploadError } =
+        const {
+            error: uploadError
+        } =
             await supabaseClient
                 .storage
                 .from(BUCKET)
@@ -272,13 +401,18 @@ async function subirFoto(archivo) {
                     ruta,
                     archivo,
                     {
-                        cacheControl: "3600",
-                        upsert: false
+                        cacheControl:
+                            "3600",
+
+                        upsert:
+                            false
                     }
                 );
 
 
-        if (uploadError) {
+        if (
+            uploadError
+        ) {
 
             console.error(
                 "Error Storage:",
@@ -293,11 +427,13 @@ async function subirFoto(archivo) {
         }
 
 
-        // ======================================
-        // GUARDAR EN TABLA
-        // ======================================
+        // ==========================================
+        // GUARDAR EN BASE DE DATOS
+        // ==========================================
 
-        const { error: databaseError } =
+        const {
+            error: databaseError
+        } =
             await supabaseClient
                 .from(TABLA)
                 .insert({
@@ -308,8 +444,9 @@ async function subirFoto(archivo) {
                     ruta_foto:
                         ruta,
 
+                    // AQUÍ SE GUARDA EL MENSAJE
                     descripcion:
-                        "Un recuerdo de nuestra galaxia ✨",
+                        mensaje,
 
                     subido_por:
                         "Amiga"
@@ -317,7 +454,13 @@ async function subirFoto(archivo) {
                 });
 
 
-        if (databaseError) {
+        // ==========================================
+        // SI FALLA LA BASE DE DATOS
+        // ==========================================
+
+        if (
+            databaseError
+        ) {
 
             console.error(
                 "Error Base de Datos:",
@@ -325,8 +468,9 @@ async function subirFoto(archivo) {
             );
 
 
-            // Si falla la BD,
-            // eliminar la imagen del Storage.
+            // Borrar la imagen
+            // si no pudo guardarse
+            // el registro
 
             await supabaseClient
                 .storage
@@ -337,7 +481,7 @@ async function subirFoto(archivo) {
 
 
             mostrarMensaje(
-                "❌ No se pudo guardar la foto."
+                "❌ No se pudo guardar el recuerdo."
             );
 
             return false;
@@ -345,7 +489,7 @@ async function subirFoto(archivo) {
 
 
         console.log(
-            "✅ Foto subida correctamente"
+            "✅ Recuerdo guardado correctamente"
         );
 
 
@@ -357,6 +501,10 @@ async function subirFoto(archivo) {
         console.error(
             "Error inesperado:",
             error
+        );
+
+        mostrarMensaje(
+            "❌ Ocurrió un error inesperado."
         );
 
         return false;
@@ -374,17 +522,26 @@ async function cargarFotos() {
 
     try {
 
-        const { data, error } =
+
+        const {
+            data,
+            error
+        } =
             await supabaseClient
                 .from(TABLA)
                 .select("*")
                 .order(
                     "fecha_subida",
                     {
-                        ascending: true
+                        ascending:
+                            true
                     }
                 );
 
+
+        // ==========================================
+        // ERROR
+        // ==========================================
 
         if (error) {
 
@@ -401,19 +558,34 @@ async function cargarFotos() {
         }
 
 
+        // ==========================================
+        // CONTADOR
+        // ==========================================
+
         actualizarContador(
             data.length
         );
 
 
+        // ==========================================
+        // LIMPIAR GALERÍA
+        // ==========================================
+
         if (galeriaFotos) {
 
-            galeriaFotos.innerHTML = "";
+            galeriaFotos.innerHTML =
+                "";
 
         }
 
 
-        if (data.length === 0) {
+        // ==========================================
+        // GALERÍA VACÍA
+        // ==========================================
+
+        if (
+            data.length === 0
+        ) {
 
             mostrarGaleriaVacia();
 
@@ -421,8 +593,15 @@ async function cargarFotos() {
         }
 
 
+        // ==========================================
+        // CREAR TARJETAS
+        // ==========================================
+
         data.forEach(
-            function (foto, index) {
+            function (
+                foto,
+                index
+            ) {
 
                 crearTarjetaFoto(
                     foto,
@@ -446,17 +625,23 @@ async function cargarFotos() {
 
 
 // ==========================================
-// CREAR TARJETA
+// CREAR TARJETA DE FOTO
 // ==========================================
 
-function crearTarjetaFoto(foto, numero) {
+function crearTarjetaFoto(
+    foto,
+    numero
+) {
 
     if (!galeriaFotos) {
         return;
     }
 
 
-    // URL pública
+    // ==========================================
+    // OBTENER URL PÚBLICA
+    // ==========================================
+
     const { data } =
         supabaseClient
             .storage
@@ -470,105 +655,116 @@ function crearTarjetaFoto(foto, numero) {
         data.publicUrl;
 
 
-    // ======================================
+    // ==========================================
     // TARJETA
-    // ======================================
+    // ==========================================
 
     const tarjeta =
-        document.createElement("div");
+        document.createElement(
+            "div"
+        );
 
     tarjeta.className =
         "foto-card";
 
 
-    // ======================================
+    // ==========================================
     // IMAGEN
-    // ======================================
+    // ==========================================
 
     const imagen =
-        document.createElement("img");
+        document.createElement(
+            "img"
+        );
+
 
     imagen.src =
         url;
+
 
     imagen.alt =
         foto.descripcion ||
         "Recuerdo de nuestra galaxia";
 
+
     imagen.loading =
         "lazy";
 
 
-    // ======================================
+    // ==========================================
     // NÚMERO
-    // ======================================
+    // ==========================================
 
     const numeroFoto =
-        document.createElement("span");
+        document.createElement(
+            "span"
+        );
+
 
     numeroFoto.className =
         "numero-foto";
 
+
     numeroFoto.textContent =
-        "#" + numero;
+        "#" +
+        numero;
 
 
-    // ======================================
+    // ==========================================
     // INFORMACIÓN
-    // ======================================
+    // ==========================================
 
     const info =
-        document.createElement("div");
+        document.createElement(
+            "div"
+        );
+
 
     info.className =
         "foto-info";
 
 
-    const nombre =
-        document.createElement("p");
+    // ==========================================
+    // MENSAJE
+    // ==========================================
 
-    nombre.textContent =
-        foto.nombre_foto;
-
-
-    const fecha =
-        document.createElement("small");
-
-
-    if (foto.fecha_subida) {
-
-        fecha.textContent =
-            new Date(
-                foto.fecha_subida
-            ).toLocaleDateString(
-                "es-PE",
-                {
-                    day: "2-digit",
-                    month: "2-digit",
-                    year: "numeric"
-                }
-            );
-
-    }
+    const mensaje =
+        document.createElement(
+            "p"
+        );
 
 
-    info.appendChild(nombre);
+    mensaje.className =
+        "mensaje-recuerdo";
 
-    info.appendChild(fecha);
+
+    mensaje.textContent =
+        foto.descripcion ||
+        "Un recuerdo de nuestra galaxia ✨";
 
 
-    // ======================================
+    info.appendChild(
+        mensaje
+    );
+
+
+    // ==========================================
     // BOTÓN ELIMINAR
-    // ======================================
+    // ==========================================
 
     const eliminarBtn =
-        document.createElement("button");
+        document.createElement(
+            "button"
+        );
+
 
     eliminarBtn.className =
         "eliminar-foto";
 
+
     eliminarBtn.type =
         "button";
+
 
     eliminarBtn.textContent =
         "🗑️ Eliminar";
@@ -577,6 +773,7 @@ function crearTarjetaFoto(foto, numero) {
     eliminarBtn.addEventListener(
         "click",
         async function (event) {
+
 
             event.stopPropagation();
 
@@ -595,28 +792,38 @@ function crearTarjetaFoto(foto, numero) {
             eliminarBtn.disabled =
                 true;
 
+
             eliminarBtn.textContent =
                 "⏳ Eliminando...";
 
 
             const resultado =
-                await eliminarFoto(foto);
+                await eliminarFoto(
+                    foto
+                );
 
 
-            if (resultado) {
+            if (
+                resultado
+            ) {
 
                 tarjeta.remove();
 
+
                 await cargarFotos();
 
+
                 mostrarMensaje(
-                    "🗑️ Foto eliminada correctamente."
+                    "🗑️ Recuerdo eliminado correctamente."
                 );
+
 
             } else {
 
+
                 eliminarBtn.disabled =
                     false;
+
 
                 eliminarBtn.textContent =
                     "🗑️ Eliminar";
@@ -627,21 +834,24 @@ function crearTarjetaFoto(foto, numero) {
     );
 
 
-    // ======================================
+    // ==========================================
     // ARMAR TARJETA
-    // ======================================
+    // ==========================================
 
     tarjeta.appendChild(
         imagen
     );
 
+
     tarjeta.appendChild(
         numeroFoto
     );
 
+
     tarjeta.appendChild(
         info
     );
+
 
     tarjeta.appendChild(
         eliminarBtn
@@ -653,9 +863,9 @@ function crearTarjetaFoto(foto, numero) {
     );
 
 
-    // ======================================
-    // ABRIR FOTO
-    // ======================================
+    // ==========================================
+    // ABRIR FOTO GRANDE
+    // ==========================================
 
     imagen.addEventListener(
         "click",
@@ -663,7 +873,7 @@ function crearTarjetaFoto(foto, numero) {
 
             abrirFotoGrande(
                 url,
-                foto.nombre_foto
+                foto.descripcion
             );
 
         }
@@ -676,21 +886,26 @@ function crearTarjetaFoto(foto, numero) {
 // ELIMINAR FOTO
 // ==========================================
 
-async function eliminarFoto(foto) {
+async function eliminarFoto(
+    foto
+) {
 
     try {
 
+
         console.log(
             "🗑️ Eliminando:",
-            foto.nombre_foto
+            foto.ruta_foto
         );
 
 
-        // ======================================
-        // STORAGE
-        // ======================================
+        // ==========================================
+        // ELIMINAR DEL STORAGE
+        // ==========================================
 
-        const { error: storageError } =
+        const {
+            error: storageError
+        } =
             await supabaseClient
                 .storage
                 .from(BUCKET)
@@ -699,7 +914,9 @@ async function eliminarFoto(foto) {
                 ]);
 
 
-        if (storageError) {
+        if (
+            storageError
+        ) {
 
             console.error(
                 "Error eliminando Storage:",
@@ -714,11 +931,13 @@ async function eliminarFoto(foto) {
         }
 
 
-        // ======================================
-        // BASE DE DATOS
-        // ======================================
+        // ==========================================
+        // ELIMINAR DE LA BASE DE DATOS
+        // ==========================================
 
-        const { error: databaseError } =
+        const {
+            error: databaseError
+        } =
             await supabaseClient
                 .from(TABLA)
                 .delete()
@@ -728,7 +947,9 @@ async function eliminarFoto(foto) {
                 );
 
 
-        if (databaseError) {
+        if (
+            databaseError
+        ) {
 
             console.error(
                 "Error eliminando registro:",
@@ -768,7 +989,9 @@ async function eliminarFoto(foto) {
 // CONTADOR
 // ==========================================
 
-function actualizarContador(cantidad) {
+function actualizarContador(
+    cantidad
+) {
 
     if (!contador) {
         return;
@@ -822,33 +1045,77 @@ function mostrarGaleriaVacia() {
 // ABRIR FOTO GRANDE
 // ==========================================
 
-function abrirFotoGrande(url, nombre) {
+function abrirFotoGrande(
+    url,
+    mensaje
+) {
+
 
     const modal =
-        document.createElement("div");
+        document.createElement(
+            "div"
+        );
+
 
     modal.className =
         "modal-foto";
 
 
+    // ==========================================
+    // IMAGEN
+    // ==========================================
+
     const imagen =
-        document.createElement("img");
+        document.createElement(
+            "img"
+        );
+
 
     imagen.src =
         url;
 
-    imagen.alt =
-        nombre;
 
+    imagen.alt =
+        mensaje ||
+        "Recuerdo";
+
+
+    // ==========================================
+    // MENSAJE EN FOTO GRANDE
+    // ==========================================
+
+    const texto =
+        document.createElement(
+            "p"
+        );
+
+
+    texto.className =
+        "modal-mensaje";
+
+
+    texto.textContent =
+        mensaje ||
+        "Un recuerdo de nuestra galaxia ✨";
+
+
+    // ==========================================
+    // BOTÓN CERRAR
+    // ==========================================
 
     const cerrar =
-        document.createElement("button");
+        document.createElement(
+            "button"
+        );
+
 
     cerrar.className =
         "cerrar-modal";
 
+
     cerrar.type =
         "button";
+
 
     cerrar.textContent =
         "×";
@@ -864,11 +1131,18 @@ function abrirFotoGrande(url, nombre) {
     );
 
 
+    // ==========================================
+    // CERRAR HACIENDO CLIC AFUERA
+    // ==========================================
+
     modal.addEventListener(
         "click",
         function (event) {
 
-            if (event.target === modal) {
+            if (
+                event.target ===
+                modal
+            ) {
 
                 modal.remove();
 
@@ -878,13 +1152,24 @@ function abrirFotoGrande(url, nombre) {
     );
 
 
+    // ==========================================
+    // AGREGAR ELEMENTOS
+    // ==========================================
+
     modal.appendChild(
         cerrar
     );
 
+
     modal.appendChild(
         imagen
     );
+
+
+    modal.appendChild(
+        texto
+    );
+
 
     document.body.appendChild(
         modal
@@ -894,12 +1179,17 @@ function abrirFotoGrande(url, nombre) {
 
 
 // ==========================================
-// MENSAJES
+// MENSAJES DEL SISTEMA
 // ==========================================
 
-function mostrarMensaje(mensaje) {
+function mostrarMensaje(
+    mensaje
+) {
 
-    console.log(mensaje);
+
+    console.log(
+        mensaje
+    );
 
 
     let aviso =
@@ -910,11 +1200,16 @@ function mostrarMensaje(mensaje) {
 
     if (!aviso) {
 
+
         aviso =
-            document.createElement("div");
+            document.createElement(
+                "div"
+            );
+
 
         aviso.id =
             "mensajeSistema";
+
 
         document.body.appendChild(
             aviso
@@ -925,6 +1220,7 @@ function mostrarMensaje(mensaje) {
 
     aviso.textContent =
         mensaje;
+
 
     aviso.classList.add(
         "mostrar"
@@ -959,10 +1255,14 @@ console.log(
     "🌌 Galaxia de Recuerdos iniciada"
 );
 
+
 console.log(
     "✅ Supabase conectado"
 );
 
 
-cargarFotos();
+// ==========================================
+// CARGAR RECUERDOS
+// ==========================================
 
+cargarFotos();
