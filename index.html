@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+```
+<title>🌌 Nuestra Galaxia</title>
+
+<link rel="stylesheet" href="style.css">
+```
+
+</head>
+
+<body>
+
+```
+<main class="contenedor">
+
+    <!-- PORTADA -->
+    <section class="portada">
+
+        <div class="estrellas"></div>
+
+        <div class="flores">
+            🌸
+        </div>
+
+        <h1>
+            Nuestra Galaxia
+        </h1>
+
+        <p>
+            Un pequeño universo lleno de recuerdos.
+        </p>
+
+        <button id="entrarBtn" type="button">
+            ✨ Entrar
+        </button>
+
+    </section>
+
+
+    <!-- GALERÍA -->
+    <section id="galeria" class="galeria-section">
+
+        <h2>
+            🌌 Nuestros recuerdos
+        </h2>
+
+        <p id="contador">
+            0 / 50 fotos
+        </p>
+
+        <button id="subirBtn" type="button">
+            🌸 Subir una foto
+        </button>
+
+        <input
+            type="file"
+            id="fotoInput"
+            accept="image/*"
+            multiple
+            hidden
+        >
+
+        <div
+            id="galeriaFotos"
+            class="galeria-fotos">
+        </div>
+
+    </section>
+
+</main>
+
+
+<!-- SUPABASE -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<!-- NUESTRO JAVASCRIPT -->
+<script src="script.js"></script>
+```
+
+</body>
+
+</html>
